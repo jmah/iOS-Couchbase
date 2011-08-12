@@ -28,6 +28,7 @@
 // Erlang entry point
 void erl_start(int, char**);
 
+static NSString* const kInternalCouchStartedNotification = @"couchStarted";
 
 static const NSTimeInterval kWaitTimeout = 10.0;    // How long to wait for CouchDB to start
 
@@ -86,6 +87,7 @@ static const NSTimeInterval kWaitTimeout = 10.0;    // How long to wait for Couc
 
 
 - (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
     [_documentsDirectory release];
     [_bundlePath release];
     [_iniFilePath release];
@@ -143,8 +145,10 @@ static const NSTimeInterval kWaitTimeout = 10.0;    // How long to wait for Couc
                               toDir: _documentsDirectory])
         return NO;
 
+    [self performSelector: @selector(startupTimeout) withObject: nil afterDelay: kWaitTimeout];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(couchStarted:)
+                                                 name:kInternalCouchStartedNotification object:nil];
     [self performSelectorInBackground: @selector(erlangThread) withObject: nil];
-    [self performSelectorInBackground: @selector(waitForStart) withObject: nil];
     return YES;
 }
 
@@ -193,86 +197,41 @@ static const NSTimeInterval kWaitTimeout = 10.0;    // How long to wait for Couc
 
 #pragma mark WAITING FOR COUCHDB TO START:
 
-- (BOOL)shouldKeepWaiting {
-    if (CFAbsoluteTimeGetCurrent() - _timeStarted < kWaitTimeout)
-        return YES;
-    NSLog(@"Couchbase: Warning: Timeout waiting for CouchDB to start; giving up");
-    return NO;
-}
-
-
-- (BOOL)canConnectToPort:(int) port {
-	struct sockaddr_in addr = {sizeof(struct sockaddr_in), AF_INET, htons(port), {0}};
-	int sockfd = socket(AF_INET,SOCK_STREAM, 0);
-	int result = connect(sockfd,(struct sockaddr*) &addr, sizeof(addr));
-    close(sockfd);
-	return result == 0;
-}
-
-
-- (void)waitForStart
+- (void)couchStarted:(NSNotification*)n
 {
-    // This method runs on a background thread!
-	NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
-
-    // First wait for CouchDB to create the 'couch.uri' file (the 'uri_file' in default.ini):
-    NSLog(@"Couchbase: Waiting to acquire CouchDB URL...");
-	NSString *uriPath = [_documentsDirectory stringByAppendingPathComponent:@"couch.uri"];
-    
-    int port = 0;
-    do {
-        usleep(10000);
-        // Read the URI out of the file:
-        NSString *rawUriString = [NSString stringWithContentsOfFile:uriPath
-                                                           encoding:NSASCIIStringEncoding
-                                                              error:NULL];
-        if (rawUriString) {
-            NSArray *components = [rawUriString componentsSeparatedByString:@"\n"];
-            NSString *uriString = [components objectAtIndex:0];
-            if (uriString) {
-                NSURL *url = [NSURL URLWithString:uriString];
-                if (url)
-                    port = url.port.intValue;  // Got the port!
-            }
-        }
-    } while (port == 0 && [self shouldKeepWaiting]);
-    
-    if (port) {
-        // Wait till the port accepts a connection:
-        NSLog(@"Couchbase: Checking connection to CouchDB on port %i...", port);
-        while (![self canConnectToPort:port]) {
-            if (![self shouldKeepWaiting]) {
-                // Timed out trying to contact the server!
-                port = 0;
-                break;
-            }
-            usleep(2500);
-        }
-    }
-
-    // Done -- now notify the client on the main thread:
-    [self performSelectorOnMainThread:@selector(finishedWaiting:)
-                           withObject:[NSNumber numberWithInt: port]
+    // Runs on the Erlang thread, so do as little as possible and return
+    [self performSelectorOnMainThread:@selector(notifyCouchStarted:)
+                           withObject:n.userInfo
                         waitUntilDone:NO];
-	[pool drain];
 }
 
 
-- (void)finishedWaiting: (NSNumber*)portObj {
-    // Runs on the main thread after waitForStart completes.
-    UInt16 port = [portObj intValue];
-    if (port) {
-        NSURL* serverURL = [NSURL URLWithString: [NSString stringWithFormat:@"http://0.0.0.0:%i/",
-                                                  port]];
+- (void)notifyCouchStarted:(NSDictionary*)info {
+    // Runs on the main thread after the notification that the server has started
+    [NSObject cancelPreviousPerformRequestsWithTarget:self
+                                             selector:@selector(startupTimeout)
+                                               object:nil];
+    NSString* urlStr = [info objectForKey:@"uri"];
+    NSURL* serverURL = urlStr ? [NSURL URLWithString:urlStr] : nil;
+    NSError* error = nil;
+    if (serverURL) {
         NSLog(@"Couchbase: CouchDB is up and running after %.3f sec at <%@>",
               (CFAbsoluteTimeGetCurrent() - _timeStarted), serverURL);
-        self.serverURL = serverURL; // Will trigger KVO notification
     } else {
-        NSLog(@"Couchbase: Error: Unable to read CouchDB URI file / connect to server");
-        self.error = [NSError errorWithDomain: @"Couchbase" code: 1 userInfo: nil]; //TODO: Real error
+        NSLog(@"Couchbase: Error: CouchDB returned invalid server URL");
+        error = [NSError errorWithDomain:@"Couchbase" code:1 userInfo:nil]; //TODO: Real error
     }
-    
+
+    self.error = error;
+    self.serverURL = serverURL; // Will trigger KVO notification
     [_delegate couchbaseDidStart:_serverURL];
+}
+
+
+- (void)startupTimeout {
+    NSLog(@"Couchbase: Error: No startup notification from server engine");
+    self.error = [NSError errorWithDomain:@"Couchbase" code:2 userInfo:nil]; //TODO: Real error
+    [_delegate couchbaseDidStart:nil];
 }
 
 
