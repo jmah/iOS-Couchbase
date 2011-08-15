@@ -92,6 +92,19 @@ extern CouchbaseEmbeddedServer* sCouchbase;  // Defined in EmptyAppDelegate.m
     [self send: @"POST" toPath: @"/unittestdb/" body: @"{\"txt\":\"foobar\"}"];
     [self send: @"PUT" toPath: @"/unittestdb/doc1" body: @"{\"txt\":\"O HAI\"}"];
     [self send: @"GET" toPath: @"/unittestdb/doc1" body: nil];
+    [self send: @"DELETE" toPath: @"/unittestdb" body: nil];
+}
+
+
+- (void)testJSException
+{
+    // Make sure that if a JS exception is thrown by a view function, it doesn't crash Erlang.
+    [self send: @"PUT" toPath: @"/unittestdb" body: nil];
+    [self send: @"PUT" toPath: @"/unittestdb/doc1" body: @"{\"txt\":\"O HAI\"}"];
+    [self send: @"PUT" toPath: @"/unittestdb/_design/exception"
+          body: @"{\"views\":{\"oops\":{\"map\":\"function(){throw 'oops';}\"}}}"];
+    [self send: @"GET" toPath: @"/unittestdb/_design/exception/_view/oops" body: nil];
+    [self send: @"DELETE" toPath: @"/unittestdb" body: nil];
 }
 
 @end
