@@ -31,6 +31,8 @@ extern CouchbaseEmbeddedServer* sCouchbase;  // Defined in EmptyAppDelegate.m
     }
     STAssertNil(sCouchbase.error, nil);
     STAssertNotNil(sCouchbase.serverURL, nil);
+
+    [self forciblyDeleteDatabase];
 }
 
 - (void)tearDown
@@ -39,9 +41,7 @@ extern CouchbaseEmbeddedServer* sCouchbase;  // Defined in EmptyAppDelegate.m
 }
 
 
-// This is for testing only! In a real app you would not want to send URL requests synchronously.
-- (NSString*)send: (NSString*)method toPath: (NSString*)relativePath body: (NSString*)body {
-    NSLog(@"%@ %@", method, relativePath);
+- (NSURLRequest*)request: (NSString*)method path: (NSString*)relativePath body: (NSString*)body {
     NSURL* url = [NSURL URLWithString: relativePath relativeToURL: sCouchbase.serverURL];
     NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL: url];
     request.HTTPMethod = method;
@@ -49,22 +49,38 @@ extern CouchbaseEmbeddedServer* sCouchbase;  // Defined in EmptyAppDelegate.m
         request.HTTPBody = [body dataUsingEncoding: NSUTF8StringEncoding];
         [request addValue: @"application/json" forHTTPHeaderField: @"Content-Type"];
     }
+    return request;
+}
+
+
+- (NSString*)send: (NSString*)method toPath: (NSString*)relativePath body: (NSString*)body {
+    NSLog(@"%@ %@", method, relativePath);
+    NSURLRequest* request = [self request:method path:relativePath body:body];
     NSURLResponse* response = nil;
     NSError* error = nil;
     
+    // This is for testing only! In a real app you would not want to send URL requests synchronously.
     NSData* responseBody = [NSURLConnection sendSynchronousRequest: request
                                                  returningResponse: &response
                                                              error: &error];
     STAssertTrue(responseBody != nil && response != nil,
-             @"Request to <%@> failed: %@", url.absoluteString, error);
+             @"Request to <%@> failed: %@", request.URL.absoluteString, error);
     int statusCode = ((NSHTTPURLResponse*)response).statusCode;
     STAssertTrue(statusCode < 300,
-             @"Request to <%@> failed: HTTP error %i", url.absoluteString, statusCode);
+             @"Request to <%@> failed: HTTP error %i", request.URL.absoluteString, statusCode);
     
     NSString* responseStr = [[NSString alloc] initWithData: responseBody
                                                   encoding: NSUTF8StringEncoding];
     NSLog(@"Response (%d):\n%@", statusCode, responseStr);
     return [responseStr autorelease];
+}
+
+
+- (void)forciblyDeleteDatabase {
+    // No error checking, since this may return a 404
+    [NSURLConnection sendSynchronousRequest: [self request:@"DELETE" path:@"/unittestdb" body:nil]
+                          returningResponse: NULL
+                                      error: NULL];
 }
 
 

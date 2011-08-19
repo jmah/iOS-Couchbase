@@ -10,4 +10,6 @@
 
 @interface EmptyAppTests : SenTestCase
 
+- (void)forciblyDeleteDatabase;
+
 @end
