@@ -1,5 +1,5 @@
 //
-//  Couchbase.h
+//  CouchbaseMobile.h
 //  Couchbase Mobile
 //
 //  Created by J Chris Anderson on 3/2/11.
@@ -19,15 +19,25 @@
 
 
 #import <Foundation/Foundation.h>
+@class CouchbaseMobile;
+
 
 @protocol CouchbaseDelegate
 @required
--(void)couchbaseDidStart:(NSURL *)serverURL;
+/** Called after a CouchbaseMobile instance finishes starting up.
+    @param couchbase  The instance of CouchbaseMobile.
+    @param serverURL  The URL at which the Couchbase server is listening. */
+-(void)couchbaseMobile:(CouchbaseMobile*)couchbase didStart:(NSURL*)serverURL;
+
+/** Called after a CouchbaseMobile instance fails to start up.
+    @param couchbase  The instance of CouchbaseMobile.
+    @param error  The error that occurred. */
+-(void)couchbaseMobile:(CouchbaseMobile*)couchbase failedToStart:(NSError*)error;
 @end
 
 
 /** Manages an embedded instance of CouchDB that runs in a background thread. */
-@interface CouchbaseEmbeddedServer : NSObject
+@interface CouchbaseMobile : NSObject
 {
     id<CouchbaseDelegate> _delegate;
     CFAbsoluteTime _timeStarted;
@@ -36,11 +46,11 @@
     NSString* _iniFilePath;
     NSURL* _serverURL;
     NSError* _error;
-    pthread_t _erlangThread;
+    BOOL _started;
 }
 
 /** Convenience to instantiate and start a new instance. */
-+ (CouchbaseEmbeddedServer*) startCouchbase: (id<CouchbaseDelegate>)delegate;
++ (CouchbaseMobile*) startCouchbase: (id<CouchbaseDelegate>)delegate;
 
 /** Initializes the instance. */
 - (id) init;

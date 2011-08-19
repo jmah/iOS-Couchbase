@@ -78,7 +78,7 @@ _Important: The `rsync` command below is a single long line. Do not put a newlin
     # and other resources needed at runtime. Copy it into the app bundle:
     rsync -a "${SRCROOT}/Frameworks/Couchbase.framework/CouchbaseResources" "${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}"
 
-That’s it for the project setup. In your application code, you’ll need to start the CouchbaseEmbeddedServer object at launch time. (See CouchbaseEmbeddedServer.h, and see EmptyAppDelegate.m for an example of how to call it.)
+That’s it for the project setup. In your application code, you’ll need to start the CouchbaseMobile object at launch time. (See CouchbaseMobile.h, and see EmptyAppDelegate.m for an example of how to call it.)
 
 
 ## License

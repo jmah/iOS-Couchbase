@@ -7,10 +7,10 @@
 //
 
 #import "EmptyAppTests.h"
-#import <Couchbase/CouchbaseEmbeddedServer.h>
+#import <Couchbase/CouchbaseMobile.h>
 
 extern BOOL sUnitTesting;
-extern CouchbaseEmbeddedServer* sCouchbase;  // Defined in EmptyAppDelegate.m
+extern CouchbaseMobile* sCouchbase;  // Defined in EmptyAppDelegate.m
 
 @implementation EmptyAppTests
 

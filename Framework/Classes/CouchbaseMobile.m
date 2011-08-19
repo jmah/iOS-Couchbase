@@ -1,5 +1,5 @@
 //
-//  Couchbase.m
+//  CouchbaseMobile.m
 //  Couchbase Mobile
 //
 //  Created by J Chris Anderson on 3/2/11.
@@ -17,7 +17,7 @@
 // License for the specific language governing permissions and limitations under
 // the License.
 
-#import "CouchbaseEmbeddedServer.h"
+#import "CouchbaseMobile.h"
 
 #include <pthread.h>
 #include <stdlib.h>
@@ -33,7 +33,7 @@ static NSString* const kInternalCouchStartedNotification = @"couchStarted";
 static const NSTimeInterval kWaitTimeout = 10.0;    // How long to wait for CouchDB to start
 
 
-@interface CouchbaseEmbeddedServer ()
+@interface CouchbaseMobile ()
 @property (readwrite, retain) NSURL* serverURL;
 @property (readwrite, retain) NSError* error;
 - (BOOL)createDir:(NSString*)dirName;
@@ -49,11 +49,11 @@ static const NSTimeInterval kWaitTimeout = 10.0;    // How long to wait for Couc
 @end
 
 
-@implementation CouchbaseEmbeddedServer
+@implementation CouchbaseMobile
 
 
-+ (CouchbaseEmbeddedServer*) startCouchbase: (id<CouchbaseDelegate>)delegate {
-    static CouchbaseEmbeddedServer* sCouchbase;
++ (CouchbaseMobile*) startCouchbase: (id<CouchbaseDelegate>)delegate {
+    static CouchbaseMobile* sCouchbase;
     NSAssert(!sCouchbase, @"+startCouchbase has already been called");
 
     sCouchbase = [[self alloc] init];
@@ -116,7 +116,7 @@ static const NSTimeInterval kWaitTimeout = 10.0;    // How long to wait for Couc
 - (BOOL) installDefaultDatabase: (NSString*)databasePath {
     NSString* dbDir = self.databaseDirectory;
     return [self createDir: dbDir] &&
-    [self installItemNamed: databasePath fromDir:nil toDir: dbDir replace: NO];
+            [self installItemNamed: databasePath fromDir:nil toDir: dbDir replace: NO];
 }
 
 
@@ -124,7 +124,7 @@ static const NSTimeInterval kWaitTimeout = 10.0;    // How long to wait for Couc
 
 - (BOOL)start
 {
-    if (_erlangThread)
+    if (_started)
         return YES;
 
     _timeStarted = CFAbsoluteTimeGetCurrent();
@@ -145,6 +145,7 @@ static const NSTimeInterval kWaitTimeout = 10.0;    // How long to wait for Couc
                               toDir: _documentsDirectory])
         return NO;
 
+    _started = YES;
     [self performSelector: @selector(startupTimeout) withObject: nil afterDelay: kWaitTimeout];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(couchStarted:)
                                                  name:kInternalCouchStartedNotification object:nil];
@@ -224,14 +225,18 @@ static const NSTimeInterval kWaitTimeout = 10.0;    // How long to wait for Couc
 
     self.error = error;
     self.serverURL = serverURL; // Will trigger KVO notification
-    [_delegate couchbaseDidStart:_serverURL];
+
+    if (_serverURL)
+        [_delegate couchbaseMobile:self didStart:_serverURL];
+    else
+        [_delegate couchbaseMobile:self failedToStart:_error];
 }
 
 
 - (void)startupTimeout {
     NSLog(@"Couchbase: Error: No startup notification from server engine");
     self.error = [NSError errorWithDomain:@"Couchbase" code:2 userInfo:nil]; //TODO: Real error
-    [_delegate couchbaseDidStart:nil];
+    [_delegate couchbaseMobile:self failedToStart:_error];
 }
 
 

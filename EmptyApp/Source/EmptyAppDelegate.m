@@ -13,7 +13,7 @@
 
 
 BOOL sUnitTesting;
-CouchbaseEmbeddedServer* sCouchbase;  // Used by the unit tests
+CouchbaseMobile* sCouchbase;  // Used by the unit tests
 
 
 @synthesize window = _window;
@@ -28,7 +28,7 @@ CouchbaseEmbeddedServer* sCouchbase;  // Used by the unit tests
     [self.window makeKeyAndVisible];
     
     // Initialize CouchDB:
-    CouchbaseEmbeddedServer* cb = [[CouchbaseEmbeddedServer alloc] init];
+    CouchbaseMobile* cb = [[CouchbaseMobile alloc] init];
     cb.delegate = self;
     NSAssert([cb start], @"Couchbase couldn't start! Error = %@", cb.error);
     sCouchbase = cb;
@@ -85,8 +85,7 @@ CouchbaseEmbeddedServer* sCouchbase;  // Used by the unit tests
 }
 
 
-- (void)couchbaseDidStart:(NSURL *)serverURL {
-    NSAssert(serverURL != nil, @"Couchbase failed to initialize");
+-(void)couchbaseMobile:(CouchbaseMobile*)couchbase didStart:(NSURL*)serverURL {
 	NSLog(@"CouchDB is Ready, go!");
     self.serverURL = serverURL;
     
@@ -99,6 +98,11 @@ CouchbaseEmbeddedServer* sCouchbase;  // Used by the unit tests
         [self send: @"GET" toPath: @"/testdb/doc1" body: nil];
         NSLog(@"Everything works!");
     }    
+}
+
+
+-(void)couchbaseMobile:(CouchbaseMobile*)couchbase failedToStart:(NSError*)error {
+    NSAssert(NO, @"Couchbase failed to initialize: %@", error);
 }
 
 

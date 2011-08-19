@@ -7,7 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-#import <Couchbase/CouchbaseEmbeddedServer.h>
+#import <Couchbase/CouchbaseMobile.h>
 
 @interface EmptyAppDelegate : UIResponder <UIApplicationDelegate, CouchbaseDelegate>
 
