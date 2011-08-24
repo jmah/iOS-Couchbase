@@ -132,20 +132,20 @@ extern CouchbaseMobile* sCouchbase;  // Defined in EmptyAppDelegate.m
     NSDictionary* headers;
     [self send: @"GET" toPath: @"/unittestdb/_design/updateviews/_view/simple"
           body: nil responseHeaders: &headers];
-    NSLog(@"ETag: %@", [headers objectForKey: @"ETag"]);
-    NSString* eTag = [headers objectForKey: @"ETag"];
+    NSString* eTag = [headers objectForKey: @"Etag"];
+    NSLog(@"ETag: %@", eTag);
     STAssertNotNil(eTag, nil);
     [self send: @"GET" toPath: @"/unittestdb/_design/updateviews/_view/simple"
           body: nil responseHeaders: &headers];
-    NSLog(@"ETag: %@", [headers objectForKey: @"ETag"]);
-    STAssertEqualObjects([headers objectForKey: @"ETag"], eTag, @"View eTag isn't stable");
+    NSLog(@"ETag: %@", [headers objectForKey: @"Etag"]);
+    STAssertEqualObjects([headers objectForKey: @"Etag"], eTag, @"View eTag isn't stable");
 
     [self send: @"PUT" toPath: @"/unittestdb/doc2" body: @"{\"txt\":\"KTHXBYE\"}"];
 
     [self send: @"GET" toPath: @"/unittestdb/_design/updateviews/_view/simple"
           body: nil responseHeaders: &headers];
-    NSLog(@"ETag: %@", [headers objectForKey: @"ETag"]);
-    STAssertFalse([eTag isEqualToString: [headers objectForKey: @"ETag"]], @"View didn't update");
+    NSLog(@"ETag: %@", [headers objectForKey: @"Etag"]);
+    STAssertFalse([eTag isEqualToString: [headers objectForKey: @"Etag"]], @"View didn't update");
 }
 
 
