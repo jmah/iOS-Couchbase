@@ -15,4 +15,5 @@
 
 @property (retain, nonatomic) NSURL* serverURL;
 
+@property (readonly) NSString* localIPAddress;
 @end

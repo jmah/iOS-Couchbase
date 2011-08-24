@@ -7,6 +7,9 @@
 //
 
 #import "EmptyAppDelegate.h"
+#import <ifaddrs.h>
+#import <netinet/in.h>
+#import <net/if.h>
 
 
 @implementation EmptyAppDelegate
@@ -30,6 +33,11 @@ CouchbaseMobile* sCouchbase;  // Used by the unit tests
     // Initialize CouchDB:
     CouchbaseMobile* cb = [[CouchbaseMobile alloc] init];
     cb.delegate = self;
+    NSString* iniPath = [[NSBundle mainBundle] pathForResource: @"app" ofType: @"ini"];
+    if (iniPath) {
+        NSLog(@"Registering custom .ini file %@", iniPath);
+        cb.iniFilePath = iniPath;
+    }
     NSAssert([cb start], @"Couchbase couldn't start! Error = %@", cb.error);
     sCouchbase = cb;
     return YES;
@@ -87,22 +95,43 @@ CouchbaseMobile* sCouchbase;  // Used by the unit tests
 
 -(void)couchbaseMobile:(CouchbaseMobile*)couchbase didStart:(NSURL*)serverURL {
 	NSLog(@"CouchDB is Ready, go!");
+    NSLog(@"My local IP address is %@", self.localIPAddress);
     self.serverURL = serverURL;
     
     if (!sUnitTesting) {
         [self send: @"GET" toPath: @"/" body: nil];
-        [self send: @"PUT" toPath: @"/testdb" body: nil];
-        [self send: @"GET" toPath: @"/testdb" body: nil];
-        [self send: @"POST" toPath: @"/testdb/" body: @"{\"txt\":\"foobar\"}"];
-        [self send: @"PUT" toPath: @"/testdb/doc1" body: @"{\"txt\":\"O HAI\"}"];
-        [self send: @"GET" toPath: @"/testdb/doc1" body: nil];
-        NSLog(@"Everything works!");
+        NSLog(@"Couchbase is alive! Run the unit tests to be sure everything works.");
     }    
 }
 
 
 -(void)couchbaseMobile:(CouchbaseMobile*)couchbase failedToStart:(NSError*)error {
     NSAssert(NO, @"Couchbase failed to initialize: %@", error);
+}
+
+
+- (NSString*)localIPAddress {
+    // getifaddrs returns a linked list of interface entries;
+    // find the first active non-loopback interface with IPv4:
+    UInt32 address = 0;
+    struct ifaddrs *interfaces;
+    if( getifaddrs(&interfaces) == 0 ) {
+        struct ifaddrs *interface;
+        for( interface=interfaces; interface; interface=interface->ifa_next ) {
+            if( (interface->ifa_flags & IFF_UP) && ! (interface->ifa_flags & IFF_LOOPBACK) ) {
+                const struct sockaddr_in *addr = (const struct sockaddr_in*) interface->ifa_addr;
+                if( addr && addr->sin_family==AF_INET ) {
+                    address = addr->sin_addr.s_addr;
+                    break;
+                }
+            }
+        }
+        freeifaddrs(interfaces);
+    }
+
+    const UInt8* b = (const UInt8*)&address;
+    return [NSString stringWithFormat: @"%u.%u.%u.%u",
+            (unsigned)b[0],(unsigned)b[1],(unsigned)b[2],(unsigned)b[3]];
 }
 
 
