@@ -149,4 +149,27 @@ extern CouchbaseMobile* sCouchbase;  // Defined in EmptyAppDelegate.m
 }
 
 
+- (void)test3_BigNums {
+    // Test that large integers in documents don't break JS views [Issue CBMI-34]
+    [self send: @"PUT" toPath: @"/unittestdb" body: nil];
+    [self send: @"PUT" toPath: @"/unittestdb/doc1" body: @"{\"n\":1234}"];
+    [self send: @"PUT" toPath: @"/unittestdb/doc2" body: @"{\"n\":1313684610751}"];
+    [self send: @"PUT" toPath: @"/unittestdb/doc3" body: @"{\"n\":1313684610751.1234}"];
+
+    [self send: @"PUT" toPath: @"/unittestdb/_design/updateviews"
+          body: @"{\"views\":{\"simple\":{\"map\":\"function(doc){emit(doc._id,null);}\"}}}"];
+
+    NSDictionary* headers;
+    NSString* result = [self send: @"GET" toPath: @"/unittestdb/_design/updateviews/_view/simple"
+          body: nil responseHeaders: &headers];
+    NSLog(@"Result of view = %@", result);
+    STAssertEqualObjects(result, @"{\"total_rows\":3,\"offset\":0,\"rows\":[\r\n"
+                                  "{\"id\":\"doc1\",\"key\":\"doc1\",\"value\":null},\r\n"
+                                  "{\"id\":\"doc2\",\"key\":\"doc2\",\"value\":null},\r\n"
+                                  "{\"id\":\"doc3\",\"key\":\"doc3\",\"value\":null}\r\n"
+                                  "]}\n",
+                         nil);
+}
+
+
 @end
