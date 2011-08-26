@@ -215,6 +215,7 @@
 				273A733513BD471A0078870D /* Copy Header(s) */,
 				273A733F13BD4DDC0078870D /* Copy into CouchbaseResources */,
 				D9B664DE13D48BE1008CD673 /* Compile Erlang Libraries */,
+				275C2CF21406F85A002CDB72 /* Make symlinks */,
 			);
 			buildRules = (
 			);
@@ -286,6 +287,21 @@
 			shellScript = "cp \"${CONFIGURATION_BUILD_DIR}/libCouchbase.a\" \"${CONFIGURATION_BUILD_DIR}/${EXECUTABLE_PATH}\"";
 			showEnvVarsInLog = 0;
 		};
+		275C2CF21406F85A002CDB72 /* Make symlinks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Make symlinks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "ln -sf \"${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}\" \"${BUILD_DIR}/${CONFIGURATION}${EFFECTIVE_PLATFORM_NAME}/${WRAPPER_NAME}\"";
+			showEnvVarsInLog = 0;
+		};
 		D9B664DE13D48BE1008CD673 /* Compile Erlang Libraries */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -340,6 +356,7 @@
 					armv7,
 				);
 				COPY_PHASE_STRIP = NO;
+				DSTROOT = "/tmp/$(PROJECT_NAME)$(EFFECTIVE_PLATFORM_NAME).dst";
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GENERATE_MASTER_OBJECT_FILE = YES;
@@ -361,6 +378,7 @@
 					armv7,
 				);
 				COPY_PHASE_STRIP = YES;
+				DSTROOT = "/tmp/$(PROJECT_NAME)$(EFFECTIVE_PLATFORM_NAME).dst";
 				GENERATE_MASTER_OBJECT_FILE = YES;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
