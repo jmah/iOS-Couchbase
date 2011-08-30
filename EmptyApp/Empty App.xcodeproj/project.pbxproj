@@ -46,6 +46,7 @@
 /* Begin PBXFileReference section */
 		273112E6140559B30072C622 /* Listener.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Listener.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		273112EA14055A410072C622 /* app.ini */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; path = app.ini; sourceTree = "<group>"; };
+		2753C254140D54E300F334A7 /* installResources.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = installResources.sh; sourceTree = "<group>"; };
 		27A3ACE513C78BD9008CE9F0 /* Empty App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Empty App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		27A3ACE913C78BD9008CE9F0 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		27A3ACEB13C78BD9008CE9F0 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -156,6 +157,7 @@
 				27A3ACF513C78BD9008CE9F0 /* main.m */,
 				27A3ACF713C78BD9008CE9F0 /* Empty App-Prefix.pch */,
 				273112EA14055A410072C622 /* app.ini */,
+				2753C254140D54E300F334A7 /* installResources.sh */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -307,7 +309,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# The 'CouchbaseResources' subfolder of the framework contains Erlang code and other resources needed at runtime. Copy it into the app bundle:\nrm -rf \"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/CouchbaseResources\"\nrsync -a \"${TARGET_BUILD_DIR}/../${CONFIGURATION}-universal/Couchbase.framework/CouchbaseResources\" \"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}\"";
+			shellScript = Source/installResources.sh;
 			showEnvVarsInLog = 0;
 		};
 		27A3ACFE13C78BD9008CE9F0 /* ShellScript */ = {
@@ -335,8 +337,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# The 'CouchbaseResources' subfolder of the framework contains Erlang code and other resources needed at runtime. Copy it into the app bundle:\nrm -rf \"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/CouchbaseResources\"\nrsync -a \"${BUILT_PRODUCTS_DIR}/../${CONFIGURATION}-universal/Couchbase.framework/CouchbaseResources\" \"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}\"";
-			showEnvVarsInLog = 0;
+			shellScript = Source/installResources.sh;
 		};
 /* End PBXShellScriptBuildPhase section */
 
