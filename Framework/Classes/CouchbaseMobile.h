@@ -39,6 +39,7 @@
 /** Manages an embedded instance of CouchDB that runs in a background thread. */
 @interface CouchbaseMobile : NSObject
 {
+    @private
     id<CouchbaseDelegate> _delegate;
     CFAbsoluteTime _timeStarted;
     NSString* _documentsDirectory;
