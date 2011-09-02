@@ -7,6 +7,7 @@
 //
 
 #import "EmptyAppDelegate.h"
+#import <SenTestingKit/SenTestingKit.h>
 #import <ifaddrs.h>
 #import <netinet/in.h>
 #import <net/if.h>
@@ -64,44 +65,22 @@ CouchbaseMobile* sCouchbase;  // Used by the unit tests
 }
 
 
-// This is for testing only! In a real app you would not want to send URL requests synchronously.
-- (void)send: (NSString*)method toPath: (NSString*)relativePath body: (NSString*)body {
-    NSLog(@"%@ %@", method, relativePath);
-    NSURL* url = [NSURL URLWithString: relativePath relativeToURL: self.serverURL];
-    NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL: url];
-    request.HTTPMethod = method;
-    if (body) {
-        request.HTTPBody = [body dataUsingEncoding: NSUTF8StringEncoding];
-        [request addValue: @"application/json" forHTTPHeaderField: @"Content-Type"];
-    }
-    NSURLResponse* response = nil;
-    NSError* error = nil;
-    
-    NSData* responseBody = [NSURLConnection sendSynchronousRequest: request
-                                         returningResponse: &response
-                                                     error: &error];
-    NSAssert(responseBody != nil && response != nil,
-             @"Request to <%@> failed: %@", url.absoluteString, error);
-    int statusCode = ((NSHTTPURLResponse*)response).statusCode;
-    NSAssert(statusCode < 300,
-             @"Request to <%@> failed: HTTP error %i", url.absoluteString, statusCode);
-    
-    NSString* responseStr = [[NSString alloc] initWithData: responseBody
-                                                  encoding: NSUTF8StringEncoding];
-    NSLog(@"Response (%d):\n%@", statusCode, responseStr);
-    [responseStr release];
-}
-
-
 -(void)couchbaseMobile:(CouchbaseMobile*)couchbase didStart:(NSURL*)serverURL {
 	NSLog(@"CouchDB is Ready, go!");
     NSLog(@"My local IP address is %@", self.localIPAddress);
     self.serverURL = serverURL;
     
-    if (!sUnitTesting) {
-        [self send: @"GET" toPath: @"/" body: nil];
-        NSLog(@"Couchbase is alive! Run the unit tests to be sure everything works.");
-    }    
+    if (sUnitTesting)
+        return;  // Unit tests have already started
+    
+    NSString* bundleID = [[NSBundle mainBundle] bundleIdentifier];
+    if ([bundleID hasSuffix: @"Empty-App"]) {
+        NSLog(@"*** EMPTYAPP IS NOW STARTING UNIT TESTS ***\n\n\n");
+        SenTestSuite* tests = [SenTestSuite defaultTestSuite];
+        SenTestRun* result = [tests run];
+        if (!result.hasSucceeded) abort();
+        exit(0);
+    }
 }
 
 

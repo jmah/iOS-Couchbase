@@ -16,6 +16,7 @@
 		273112DF140559B30072C622 /* Couchbase.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27A3AD1A13C78C32008CE9F0 /* Couchbase.framework */; };
 		273112E1140559B30072C622 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 27A3ACF213C78BD9008CE9F0 /* InfoPlist.strings */; };
 		273112EB14055A410072C622 /* app.ini in Resources */ = {isa = PBXBuildFile; fileRef = 273112EA14055A410072C622 /* app.ini */; };
+		278D67FA1411494100198716 /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27A3AD0113C78BD9008CE9F0 /* SenTestingKit.framework */; };
 		27A3ACEA13C78BD9008CE9F0 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27A3ACE913C78BD9008CE9F0 /* UIKit.framework */; };
 		27A3ACEC13C78BD9008CE9F0 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27A3ACEB13C78BD9008CE9F0 /* Foundation.framework */; };
 		27A3ACEE13C78BD9008CE9F0 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27A3ACED13C78BD9008CE9F0 /* CoreGraphics.framework */; };
@@ -31,6 +32,8 @@
 		27A3AD1113C78BD9008CE9F0 /* EmptyAppTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 27A3AD1013C78BD9008CE9F0 /* EmptyAppTests.m */; };
 		27A3AD1B13C78C32008CE9F0 /* Couchbase.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27A3AD1A13C78C32008CE9F0 /* Couchbase.framework */; };
 		27A3AD1D13C78DAC008CE9F0 /* libstdc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 27A3AD1C13C78DAC008CE9F0 /* libstdc++.dylib */; };
+		27EE5C8614103F50000AB2D7 /* EmptyAppTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 27A3AD1013C78BD9008CE9F0 /* EmptyAppTests.m */; };
+		27EE5C8814103F59000AB2D7 /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27A3AD0113C78BD9008CE9F0 /* SenTestingKit.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -72,6 +75,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				278D67FA1411494100198716 /* SenTestingKit.framework in Frameworks */,
 				273112DB140559B30072C622 /* libstdc++.dylib in Frameworks */,
 				273112DC140559B30072C622 /* UIKit.framework in Frameworks */,
 				273112DD140559B30072C622 /* Foundation.framework in Frameworks */,
@@ -88,6 +92,7 @@
 				27A3ACEA13C78BD9008CE9F0 /* UIKit.framework in Frameworks */,
 				27A3ACEC13C78BD9008CE9F0 /* Foundation.framework in Frameworks */,
 				27A3ACEE13C78BD9008CE9F0 /* CoreGraphics.framework in Frameworks */,
+				27EE5C8814103F59000AB2D7 /* SenTestingKit.framework in Frameworks */,
 				27A3AD1B13C78C32008CE9F0 /* Couchbase.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -357,6 +362,7 @@
 			files = (
 				27A3ACF613C78BD9008CE9F0 /* main.m in Sources */,
 				27A3ACFA13C78BD9008CE9F0 /* EmptyAppDelegate.m in Sources */,
+				27EE5C8614103F50000AB2D7 /* EmptyAppTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -401,6 +407,10 @@
 		273112E4140559B30072C622 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(DEVELOPER_FRAMEWORKS_DIR)\"",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				INFOPLIST_FILE = "Source/Empty App-Info.plist";
 				PRODUCT_NAME = Listener;
@@ -413,6 +423,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				DEPLOYMENT_POSTPROCESSING = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(DEVELOPER_FRAMEWORKS_DIR)\"",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				INFOPLIST_FILE = "Source/Empty App-Info.plist";
 				PRODUCT_NAME = Listener;
@@ -484,6 +498,10 @@
 		27A3AD1513C78BD9008CE9F0 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(DEVELOPER_FRAMEWORKS_DIR)\"",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				INFOPLIST_FILE = "Source/Empty App-Info.plist";
 				PRODUCT_NAME = "Empty App";
@@ -496,6 +514,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				DEPLOYMENT_POSTPROCESSING = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(DEVELOPER_FRAMEWORKS_DIR)\"",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				INFOPLIST_FILE = "Source/Empty App-Info.plist";
 				PRODUCT_NAME = "Empty App";
