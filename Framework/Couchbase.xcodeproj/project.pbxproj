@@ -78,6 +78,7 @@
 		3DEAEA6612A2D70B00EEBD22 /* erlang */ = {isa = PBXFileReference; lastKnownFileType = folder; name = erlang; path = ../erlang; sourceTree = "<group>"; };
 		79C3C6F4131F011A00C8B96D /* CouchbaseMobile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CouchbaseMobile.h; sourceTree = "<group>"; };
 		79C3C6F5131F011A00C8B96D /* CouchbaseMobile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CouchbaseMobile.m; sourceTree = "<group>"; };
+		D9243045141A6BAD002CD246 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -156,6 +157,7 @@
 		29B97323FDCFA39411CA2CEA /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				D9243045141A6BAD002CD246 /* UIKit.framework */,
 				27167ECB13C4E644001CC5B6 /* libiErl14.a */,
 				27167ECD13C4E64B001CC5B6 /* libiMonkey.a */,
 				03E839481353ADE600D64D0D /* libcrypto-iphoneos.a */,

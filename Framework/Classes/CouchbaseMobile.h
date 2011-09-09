@@ -47,6 +47,7 @@
     NSString* _iniFilePath;
     NSURL* _serverURL;
     NSError* _error;
+    BOOL _autoRestart;
     BOOL _started;
 }
 
@@ -63,6 +64,9 @@
     @return  YES if the server is starting, NO if it failed to start. */
 - (BOOL) start;
 
+/** Restart the server, necessary if app being suspended closes its listening socket */
+- (void) restart;
+
 /** The HTTP URL the server is listening on.
     Will be nil until the server has finished starting up, some time after -start is called.
     This property is KV-observable, so an alternative to setting a delegate is to observe this
@@ -72,6 +76,9 @@
 /** If the server fails to start up, this will be set to a description of the error.
     This is KV-observable. */
 @property (readonly, retain) NSError* error;
+
+/** Defaults to YES, set to NO to prevent auto-restart behavior when app returns from background */
+@property (assign) BOOL autoRestart;
 
 #pragma mark CONFIGURATION:
 

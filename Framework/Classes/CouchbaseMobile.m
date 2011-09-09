@@ -24,11 +24,14 @@
 #include <unistd.h>
 #include <sys/socket.h>
 #include <netdb.h>
+#include <UIKit/UIApplication.h>
 
 // Erlang entry point
 void erl_start(int, char**);
 
 static NSString* const kInternalCouchStartedNotification = @"couchStarted";
+static NSString* const kInternalRestartCouchNotification = @"CouchDBRequestRestart";
+
 
 static const NSTimeInterval kWaitTimeout = 10.0;    // How long to wait for CouchDB to start
 
@@ -82,6 +85,7 @@ static const NSTimeInterval kWaitTimeout = 10.0;    // How long to wait for Couc
 - (id)init {
     NSString* bundlePath = [[NSBundle mainBundle] pathForResource:@"CouchbaseResources" ofType:nil];
     NSAssert(bundlePath, @"Couldn't find CouchbaseResources bundle in app's Resources directory");
+    _autoRestart = YES;
     return [self initWithBundlePath: bundlePath];
 }
 
@@ -97,7 +101,7 @@ static const NSTimeInterval kWaitTimeout = 10.0;    // How long to wait for Couc
 }
 
 
-@synthesize delegate = _delegate, iniFilePath=_iniFilePath, serverURL = _serverURL, error = _error;
+@synthesize delegate = _delegate, iniFilePath=_iniFilePath, serverURL = _serverURL, error = _error, autoRestart = _autoRestart;
 
 
 - (NSString*) logDirectory {
@@ -149,10 +153,20 @@ static const NSTimeInterval kWaitTimeout = 10.0;    // How long to wait for Couc
     [self performSelector: @selector(startupTimeout) withObject: nil afterDelay: kWaitTimeout];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(couchStarted:)
                                                  name:kInternalCouchStartedNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(maybeRestart)
+                                                 name:UIApplicationWillEnterForegroundNotification object:nil];
     [self performSelectorInBackground: @selector(erlangThread) withObject: nil];
     return YES;
 }
 
+- (void) maybeRestart {
+    if (_autoRestart) [self restart];
+}
+
+- (void) restart {
+    [[NSNotificationCenter defaultCenter] 
+     postNotificationName:kInternalRestartCouchNotification object:nil];
+}
 
 #pragma mark LAUNCHING ERLANG:
 
