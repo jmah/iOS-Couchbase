@@ -3,7 +3,7 @@
 # needed at runtime. Copy it into the app bundle:
 
 # Directory containing the built Couchbase.framework:
-COUCHBASE_FRAMEWORK_DIR="${TARGET_BUILD_DIR}/../${CONFIGURATION}-universal"
+COUCHBASE_FRAMEWORK_DIR="${CONFIGURATION_BUILD_DIR}/../${CONFIGURATION}-universal"
 # The app's Resources directory, where CouchbaseResources will go:
 RESOURCES_DIR="${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}"
 
