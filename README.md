@@ -68,9 +68,10 @@ The empty app, as the name implies, doesn't actually do anything. It's just an i
 
 1. Open your Xcode project.
 2. Drag the Couchbase.framework you built previously into the “Frameworks” section of the file list in your project window.
-3. If your project doesn't already contain any C++ code, you'll need to add the C++ library: Go to the target's Build Phases, open "Link Binary With Libraries", click the "+" button, and add "libstdc++.dylib".
-4. Go to the target's Build Phases and add a new Run Script phase.
-5. Paste the following into the script content of the new phase. (NOTE: If you put the Couchbase framework elsewhere, update the path in the 2nd argument to ‘rsync’ accordingly.)
+3. Link your target against the Security framework if it doesn't already. Go to the target's Build Phases and open "Link Binary With Libraries". If "Security.framework" isn't in the list, click the "+" button, and add it.
+4. Similarly, if your project doesn't already contain any C++ code, you'll need to add the C++ library ("libstdc++.dylib") using the same steps as above.
+5. Go to the target's Build Phases and add a new Run Script phase.
+6. Paste the following into the script content of the new phase. (NOTE: If you put the Couchbase framework elsewhere, update the path in the 2nd argument to ‘rsync’ accordingly.)
 
 _Important: The `rsync` command below is a single long line. Do not put a newline in the middle!_
 

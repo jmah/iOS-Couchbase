@@ -9,10 +9,6 @@
 /* Begin PBXBuildFile section */
 		27167C5C13C4DB53001CC5B6 /* CouchbaseMobile.h in Headers */ = {isa = PBXBuildFile; fileRef = 79C3C6F4131F011A00C8B96D /* CouchbaseMobile.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		27167C5E13C4DB53001CC5B6 /* CouchbaseMobile.m in Sources */ = {isa = PBXBuildFile; fileRef = 79C3C6F5131F011A00C8B96D /* CouchbaseMobile.m */; };
-		27167C6213C4DB53001CC5B6 /* libcrypto-iphonesimulator.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 03E8394C1353ADF300D64D0D /* libcrypto-iphonesimulator.a */; };
-		27167C6313C4DB53001CC5B6 /* libssl-iphonesimulator.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 03E8394D1353ADF300D64D0D /* libssl-iphonesimulator.a */; };
-		27167C6B13C4DFFF001CC5B6 /* libcrypto-iphoneos.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 03E839481353ADE600D64D0D /* libcrypto-iphoneos.a */; };
-		27167C6C13C4E002001CC5B6 /* libssl-iphoneos.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 03E839491353ADE600D64D0D /* libssl-iphoneos.a */; };
 		27167ECC13C4E644001CC5B6 /* libiErl14.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 27167ECB13C4E644001CC5B6 /* libiErl14.a */; };
 		273A733613BD473D0078870D /* CouchbaseMobile.h in Copy Header(s) */ = {isa = PBXBuildFile; fileRef = 79C3C6F4131F011A00C8B96D /* CouchbaseMobile.h */; };
 		273A734213BD4DE90078870D /* default.ini in Copy into CouchbaseResources */ = {isa = PBXBuildFile; fileRef = 3D4791CB12A19F6A00581D10 /* default.ini */; };
@@ -87,10 +83,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				27167ECC13C4E644001CC5B6 /* libiErl14.a in Frameworks */,
-				27167C6213C4DB53001CC5B6 /* libcrypto-iphonesimulator.a in Frameworks */,
-				27167C6313C4DB53001CC5B6 /* libssl-iphonesimulator.a in Frameworks */,
-				27167C6B13C4DFFF001CC5B6 /* libcrypto-iphoneos.a in Frameworks */,
-				27167C6C13C4E002001CC5B6 /* libssl-iphoneos.a in Frameworks */,
 				278FE89713E74C7A009FEE49 /* libiMonkey.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

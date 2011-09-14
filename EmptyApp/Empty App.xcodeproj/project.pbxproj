@@ -17,6 +17,8 @@
 		273112E1140559B30072C622 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 27A3ACF213C78BD9008CE9F0 /* InfoPlist.strings */; };
 		273112EB14055A410072C622 /* app.ini in Resources */ = {isa = PBXBuildFile; fileRef = 273112EA14055A410072C622 /* app.ini */; };
 		278D67FA1411494100198716 /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27A3AD0113C78BD9008CE9F0 /* SenTestingKit.framework */; };
+		27962304142026430051455D /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27962303142026430051455D /* Security.framework */; };
+		2796230D142109170051455D /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27962303142026430051455D /* Security.framework */; };
 		27A3ACEA13C78BD9008CE9F0 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27A3ACE913C78BD9008CE9F0 /* UIKit.framework */; };
 		27A3ACEC13C78BD9008CE9F0 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27A3ACEB13C78BD9008CE9F0 /* Foundation.framework */; };
 		27A3ACEE13C78BD9008CE9F0 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27A3ACED13C78BD9008CE9F0 /* CoreGraphics.framework */; };
@@ -50,6 +52,7 @@
 		273112E6140559B30072C622 /* Listener.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Listener.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		273112EA14055A410072C622 /* app.ini */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; path = app.ini; sourceTree = "<group>"; };
 		2753C254140D54E300F334A7 /* installResources.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = installResources.sh; sourceTree = "<group>"; };
+		27962303142026430051455D /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		27A3ACE513C78BD9008CE9F0 /* Empty App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Empty App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		27A3ACE913C78BD9008CE9F0 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		27A3ACEB13C78BD9008CE9F0 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -75,12 +78,13 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				278D67FA1411494100198716 /* SenTestingKit.framework in Frameworks */,
-				273112DB140559B30072C622 /* libstdc++.dylib in Frameworks */,
-				273112DC140559B30072C622 /* UIKit.framework in Frameworks */,
-				273112DD140559B30072C622 /* Foundation.framework in Frameworks */,
-				273112DE140559B30072C622 /* CoreGraphics.framework in Frameworks */,
 				273112DF140559B30072C622 /* Couchbase.framework in Frameworks */,
+				273112DE140559B30072C622 /* CoreGraphics.framework in Frameworks */,
+				273112DD140559B30072C622 /* Foundation.framework in Frameworks */,
+				2796230D142109170051455D /* Security.framework in Frameworks */,
+				278D67FA1411494100198716 /* SenTestingKit.framework in Frameworks */,
+				273112DC140559B30072C622 /* UIKit.framework in Frameworks */,
+				273112DB140559B30072C622 /* libstdc++.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -88,6 +92,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				27962304142026430051455D /* Security.framework in Frameworks */,
 				27A3AD1D13C78DAC008CE9F0 /* libstdc++.dylib in Frameworks */,
 				27A3ACEA13C78BD9008CE9F0 /* UIKit.framework in Frameworks */,
 				27A3ACEC13C78BD9008CE9F0 /* Foundation.framework in Frameworks */,
@@ -114,6 +119,7 @@
 		27A3ACDA13C78BD9008CE9F0 = {
 			isa = PBXGroup;
 			children = (
+				27962303142026430051455D /* Security.framework */,
 				27A3ACEF13C78BD9008CE9F0 /* Source */,
 				27A3AD0813C78BD9008CE9F0 /* Tests */,
 				27A3ACE813C78BD9008CE9F0 /* Frameworks */,

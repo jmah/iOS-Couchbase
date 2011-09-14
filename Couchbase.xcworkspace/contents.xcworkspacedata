@@ -16,7 +16,4 @@
    <FileRef
       location = "group:../vendor/iMonkey/iMonkey.xcodeproj">
    </FileRef>
-   <FileRef
-      location = "group:../vendor/ios-openssl/openssl.xcodeproj">
-   </FileRef>
 </Workspace>
