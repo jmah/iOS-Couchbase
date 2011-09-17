@@ -172,4 +172,31 @@ extern CouchbaseMobile* sCouchbase;  // Defined in EmptyAppDelegate.m
 }
 
 
+- (void)test4_ObjCViews {
+    [self send: @"PUT" toPath: @"/unittestdb" body: nil];
+    [self send: @"PUT" toPath: @"/unittestdb/doc1" body: @"{\"txt\":\"O HAI MR Obj-C!\"}"];
+
+    [self send: @"PUT" toPath: @"/unittestdb/_design/objcview"
+          body: @"{\"language\":\"objc\", \"views\":{\"testobjc\":{\"map\":\"-[DummyClass map:]\"}}}"];
+
+    NSDictionary* headers;
+    [self send: @"GET" toPath: @"/unittestdb/_design/objcview/_view/testobjc"
+          body: nil responseHeaders: &headers];
+    NSString* eTag = [headers objectForKey: @"Etag"];
+    NSLog(@"ETag: %@", eTag);
+    STAssertNotNil(eTag, nil);
+    [self send: @"GET" toPath: @"/unittestdb/_design/objcview/_view/testobjc"
+          body: nil responseHeaders: &headers];
+    NSLog(@"ETag: %@", [headers objectForKey: @"Etag"]);
+    STAssertEqualObjects([headers objectForKey: @"Etag"], eTag, @"View eTag isn't stable");
+
+    [self send: @"PUT" toPath: @"/unittestdb/doc2" body: @"{\"txt\":\"KTHXBYE\"}"];
+
+    [self send: @"GET" toPath: @"/unittestdb/_design/objcview/_view/testobjc"
+          body: nil responseHeaders: &headers];
+    NSLog(@"ETag: %@", [headers objectForKey: @"Etag"]);
+    STAssertFalse([eTag isEqualToString: [headers objectForKey: @"Etag"]], @"View didn't update");
+}
+
+
 @end
