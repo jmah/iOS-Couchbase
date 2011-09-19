@@ -13,3 +13,8 @@
 - (void)forciblyDeleteDatabase;
 
 @end
+
+
+@interface TestView : NSObject
++ (NSString *)map:(NSString *)json;
+@end

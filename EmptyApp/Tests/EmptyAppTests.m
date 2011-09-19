@@ -177,7 +177,7 @@ extern CouchbaseMobile* sCouchbase;  // Defined in EmptyAppDelegate.m
     [self send: @"PUT" toPath: @"/unittestdb/doc1" body: @"{\"txt\":\"O HAI MR Obj-C!\"}"];
 
     [self send: @"PUT" toPath: @"/unittestdb/_design/objcview"
-          body: @"{\"language\":\"objc\", \"views\":{\"testobjc\":{\"map\":\"-[DummyClass map:]\"}}}"];
+          body: @"{\"language\":\"objc\", \"views\":{\"testobjc\":{\"map\":\"+[TestView map:]\"}}}"];
 
     NSDictionary* headers;
     [self send: @"GET" toPath: @"/unittestdb/_design/objcview/_view/testobjc"
@@ -198,5 +198,16 @@ extern CouchbaseMobile* sCouchbase;  // Defined in EmptyAppDelegate.m
     STAssertFalse([eTag isEqualToString: [headers objectForKey: @"Etag"]], @"View didn't update");
 }
 
+
+@end
+
+
+@implementation TestView
+
++ (NSString *)map:(NSString *)json;
+{
+    // Return an array of (key, value) pairs
+    return @"[[\"objc\", true]]";
+}
 
 @end
