@@ -177,7 +177,8 @@ extern CouchbaseMobile* sCouchbase;  // Defined in EmptyAppDelegate.m
     [self send: @"PUT" toPath: @"/unittestdb/doc1" body: @"{\"txt\":\"O HAI MR Obj-C!\"}"];
 
     [self send: @"PUT" toPath: @"/unittestdb/_design/objcview"
-          body: @"{\"language\":\"objc\", \"views\":{\"testobjc\":{\"map\":\"+[TestView map:]\"}}}"];
+          body: @"{\"language\":\"objc\", \"views\":{\"testobjc\":"
+                @"{\"map\":\"+[TestView mapDocument:]\",\"reduce\":\"+[TestView reduceKeys:values:again:]\"}}}"];
 
     NSDictionary* headers;
     [self send: @"GET" toPath: @"/unittestdb/_design/objcview/_view/testobjc"
@@ -204,10 +205,16 @@ extern CouchbaseMobile* sCouchbase;  // Defined in EmptyAppDelegate.m
 
 @implementation TestView
 
-+ (NSString *)map:(NSString *)json;
++ (NSString *)mapDocument:(NSString *)json;
 {
     // Return an array of (key, value) pairs
     return @"[[\"objc\", true]]";
+}
+
++ (NSString *)reduceKeys:(NSString *)keysJson values:(NSString *)valsJson again:(BOOL)rereduce;
+{
+    // keys is an array of (key, value) pairs
+    return [[NSNumber numberWithUnsignedInteger:valsJson.length] stringValue];
 }
 
 @end
