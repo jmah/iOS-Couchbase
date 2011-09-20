@@ -1,5 +1,5 @@
 #!/bin/bash
-ERLANG_DSTDIR="${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/CouchbaseResources/erlang"
+ERLANG_DSTDIR="${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/CouchbaseResources"
 
 cd ../../vendor/couchdb/share/server
 
