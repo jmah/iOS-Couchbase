@@ -232,6 +232,11 @@ extern CouchbaseMobile* sCouchbase;  // Defined in EmptyAppDelegate.m
 
 @implementation TestView
 
++ (NSString *)couchViewVersionIdentifierForSelector:(SEL)sel;
+{
+    return @"v1.0";
+}
+
 + (NSString *)mapDocument:(NSString *)json;
 {
     // Return an array of (key, value) pairs
