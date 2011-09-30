@@ -33,7 +33,7 @@ static NSString* const kInternalCouchStartedNotification = @"couchStarted";
 static NSString* const kInternalRestartCouchNotification = @"CouchDBRequestRestart";
 
 
-static const NSTimeInterval kWaitTimeout = 10.0;    // How long to wait for CouchDB to start
+static const NSTimeInterval kWaitTimeout = 30.0;    // How long to wait for CouchDB to start
 
 
 @interface CouchbaseMobile ()
