@@ -232,27 +232,27 @@ extern CouchbaseMobile* sCouchbase;  // Defined in EmptyAppDelegate.m
 
 @implementation TestView
 
-+ (NSString *)couchViewVersionIdentifierForSelector:(SEL)sel;
++ (NSString *)couchViewVersionIdentifierForSelector:(SEL)sel
 {
     return @"v1.0";
 }
 
-+ (NSString *)mapDocument:(NSString *)json;
++ (NSArray*) mapDocument:(NSDictionary *)doc
 {
     // Return an array of (key, value) pairs
-    return @"[[\"objc\", true]]";
+    return [NSArray arrayWithObject: [NSArray arrayWithObjects: @"objc", (id)kCFBooleanTrue, nil]];
 }
 
-+ (NSString *)fauxMap:(NSString *)json;
++ (NSArray*) fauxMap:(NSDictionary*)doc
 {
     // Return an array of (key, value) pairs
-    return @"[[\"objc\", false]]";
+    return [NSArray arrayWithObject: [NSArray arrayWithObjects: @"objc", (id)kCFBooleanFalse, nil]];
 }
 
-+ (NSString *)reduceKeys:(NSString *)keysJson values:(NSString *)valsJson again:(BOOL)rereduce;
++ (id) reduceKeys:(NSArray*)keys values:(NSArray*)vals again:(BOOL)rereduce
 {
     // keys is an array of (key, value) pairs
-    return [[NSNumber numberWithUnsignedInteger:valsJson.length] stringValue];
+    return [NSNumber numberWithUnsignedInteger:vals.count];
 }
 
 @end
