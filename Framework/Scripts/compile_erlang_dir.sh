@@ -12,4 +12,5 @@ set -e  # Bail out if any command returns an error
 
 echo "Building $1 into $3"
 cd "../../vendor/couchdb/src/$1"
+mkdir -p "$3"
 erlc -W0 +compressed -o "$3" $2

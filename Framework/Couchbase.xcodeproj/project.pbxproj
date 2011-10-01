@@ -310,7 +310,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Copies the canned 'erlang' directory into CouchbaseResources, and compiles CouchDB and other libraries into that destination directory.\nScripts/build_erlang_packages.sh\nScripts/concat_js_files.sh";
+			shellScript = "# Copies the canned 'erlang' directory into CouchbaseResources, and compiles CouchDB and other libraries into that destination directory.\nset -e # bail out on error\nScripts/build_erlang_packages.sh\nScripts/concat_js_files.sh";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
