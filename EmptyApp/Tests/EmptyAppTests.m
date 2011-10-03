@@ -200,12 +200,19 @@ extern CouchbaseMobile* sCouchbase;  // Defined in EmptyAppDelegate.m
 
 - (void)test5_ObjCViews {
     [self send: @"PUT" toPath: @"/unittestdb" body: nil];
-    [self send: @"PUT" toPath: @"/unittestdb/doc1" body: @"{\"txt\":\"O HAI MR Obj-C!\"}"];
+    [self send: @"PUT" toPath: @"/unittestdb/doc1" body: @"{\"txt\":\"O HAI MR Obj-C!\","
+        "\"numbers\": {\"int\": 1234567, \"float\": 1234.5678, \"zero\": 0},"
+        "\"bignum\": 12345678901234567890,"
+        "\"special\": [false, null, true],"
+        "\"empty array\":[],"
+        "\"empty dict\": {}}"];
 
     [self send: @"PUT" toPath: @"/unittestdb/_design/objcview"
           body: @"{\"language\":\"objc\", \"views\":"
-                @"{\"testobjc\":{\"map\":\"+[TestView mapDocument:]\",\"reduce\":\"+[TestView reduceKeys:values:again:]\"},"
-                @" \"testmap2\":{\"map\":\"+[TestView fauxMap:]\",\"reduce\":\"+[TestView reduceKeys:values:again:]\"}}}"];
+                @"{\"testobjc\":{\"map\":\"+[TestView testValuesMap:]\","
+                @"\"reduce\":\"+[TestView reduceKeys:values:again:]\"},"
+                @"\"testmap2\":{\"map\":\"+[TestView fauxMap:]\","
+                @"\"reduce\":\"+[TestView reduceKeys:values:again:]\"}}}"];
 
     NSDictionary* headers;
     [self send: @"GET" toPath: @"/unittestdb/_design/objcview/_view/testobjc"
@@ -237,10 +244,30 @@ extern CouchbaseMobile* sCouchbase;  // Defined in EmptyAppDelegate.m
     return @"v1.0";
 }
 
-+ (NSArray*) mapDocument:(NSDictionary *)doc
+#define NSAssertEqualObjects(A,B,MSG) NSAssert([(A) isEqual: (B)], @"Expected %@, got %@", (B), (A))
+#define NSAssertAlmostEqual(A,B) NSAssert(fabs((A)/(double)(B))-1.0 < 0.001, \
+                                          @"Expected %lf, got %lf", (B), (A))
+
++ (NSArray*) testValuesMap:(NSDictionary *)doc
 {
+    NSString* txt = [doc objectForKey: @"txt"];
+    NSAssert(txt != nil, @"Missing txt key");
+    if ([txt isEqualToString: @"O HAI MR Obj-C!"]) {
+        // this is the doc with test values:
+        NSDictionary* numbers = [NSDictionary dictionaryWithObjectsAndKeys:
+                                 [NSNumber numberWithInt: 1234567], @"int",
+                                 [NSNumber numberWithDouble: 1234.5678], @"float",
+                                 [NSNumber numberWithInt: 0], @"zero", nil];
+        NSAssertEqualObjects(numbers, [doc objectForKey: @"numbers"], nil);
+        NSAssertAlmostEqual([[doc objectForKey: @"bignum"] doubleValue], 12345678901234567890.0);
+        NSArray* special = [NSArray arrayWithObjects: (id)kCFBooleanFalse,
+                                                      [NSNull null], kCFBooleanTrue, nil];
+        NSAssertEqualObjects(special, [doc objectForKey: @"special"], nil);
+        NSAssertEqualObjects([NSArray array], [doc objectForKey: @"empty array"], nil);
+        NSAssertEqualObjects([NSDictionary dictionary], [doc objectForKey: @"empty dict"], nil);
+    }
     // Return an array of (key, value) pairs
-    return [NSArray arrayWithObject: [NSArray arrayWithObjects: @"objc", (id)kCFBooleanTrue, nil]];
+    return [NSArray arrayWithObject: [NSArray arrayWithObjects: txt, (id)kCFBooleanTrue, nil]];
 }
 
 + (NSArray*) fauxMap:(NSDictionary*)doc

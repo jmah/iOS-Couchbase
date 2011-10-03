@@ -17,6 +17,7 @@
 
 @interface TestView : NSObject
 + (NSString *)couchViewVersionIdentifierForSelector:(SEL)sel;
-+ (NSString *)mapDocument:(NSString *)json;
++ (NSString *)testValuesMap:(NSString *)json;
++ (NSArray*) fauxMap:(NSDictionary*)doc;
 + (NSString *)reduceKeys:(NSString *)keysJson values:(NSString *)valsJson again:(BOOL)rereduce;
 @end
