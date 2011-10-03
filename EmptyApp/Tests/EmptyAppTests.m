@@ -8,6 +8,7 @@
 
 #import "EmptyAppTests.h"
 #import <Couchbase/CouchbaseMobile.h>
+#import <Couchbase/CouchbaseViewRegistry.h>
 
 extern BOOL sUnitTesting;
 extern CouchbaseMobile* sCouchbase;  // Defined in EmptyAppDelegate.m
@@ -198,6 +199,10 @@ extern CouchbaseMobile* sCouchbase;  // Defined in EmptyAppDelegate.m
 }
 
 
+#define NSAssertAlmostEqual(A,B) STAssertTrue(fabs((A)/(double)(B))-1.0 < 0.001, \
+@"Expected %lf, got %lf", (B), (A))
+
+
 - (void)test5_ObjCViews {
     [self send: @"PUT" toPath: @"/unittestdb" body: nil];
     [self send: @"PUT" toPath: @"/unittestdb/doc1" body: @"{\"txt\":\"O HAI MR Obj-C!\","
@@ -206,13 +211,48 @@ extern CouchbaseMobile* sCouchbase;  // Defined in EmptyAppDelegate.m
         "\"special\": [false, null, true],"
         "\"empty array\":[],"
         "\"empty dict\": {}}"];
+    
+    [[CouchbaseViewRegistry sharedInstance] registerMapBlock:
+     ^(NSDictionary *doc, CouchEmitBlock emit) {
+         NSString* txt = [doc objectForKey: @"txt"];
+         NSLog(@"In map block: txt=%@", txt);
+         NSAssert(txt != nil, @"Missing txt key");
+         if ([txt isEqualToString: @"O HAI MR Obj-C!"]) {
+             // this is the doc with test values:
+             NSDictionary* numbers = [NSDictionary dictionaryWithObjectsAndKeys:
+                                      [NSNumber numberWithInt: 1234567], @"int",
+                                      [NSNumber numberWithDouble: 1234.5678], @"float",
+                                      [NSNumber numberWithInt: 0], @"zero", nil];
+             STAssertEqualObjects(numbers, [doc objectForKey: @"numbers"], nil);
+             NSAssertAlmostEqual([[doc objectForKey: @"bignum"] doubleValue], 12345678901234567890.0);
+             NSArray* special = [NSArray arrayWithObjects: (id)kCFBooleanFalse,
+                                 [NSNull null], kCFBooleanTrue, nil];
+             STAssertEqualObjects(special, [doc objectForKey: @"special"], nil);
+             STAssertEqualObjects([NSArray array], [doc objectForKey: @"empty array"], nil);
+             STAssertEqualObjects([NSDictionary dictionary], [doc objectForKey: @"empty dict"], nil);
+         }
+         emit(txt, nil);
+     } forKey: @"testValuesMap"];
+    
+    [[CouchbaseViewRegistry sharedInstance] registerMapBlock:
+     ^(NSDictionary *doc, CouchEmitBlock emit) {
+         NSLog(@"In faux map block");
+         emit(@"objc", nil);
+     } forKey: @"fauxMap"];
+
+    
+    [[CouchbaseViewRegistry sharedInstance] registerReduceBlock:
+     ^ id (NSArray *keys, NSArray *values, BOOL rereduce) {
+         NSLog(@"In reduce block");
+         return [NSNumber numberWithUnsignedInteger:values.count];
+     } forKey:@"count"];
 
     [self send: @"PUT" toPath: @"/unittestdb/_design/objcview"
           body: @"{\"language\":\"objc\", \"views\":"
-                @"{\"testobjc\":{\"map\":\"+[TestView testValuesMap:]\","
-                @"\"reduce\":\"+[TestView reduceKeys:values:again:]\"},"
-                @"\"testmap2\":{\"map\":\"+[TestView fauxMap:]\","
-                @"\"reduce\":\"+[TestView reduceKeys:values:again:]\"}}}"];
+                @"{\"testobjc\":{\"map\":\"testValuesMap\","
+                @"\"reduce\":\"count\"},"
+                @"\"testmap2\":{\"map\":\"fauxMap\","
+                @"\"reduce\":\"count\"}}}"];
 
     NSDictionary* headers;
     [self send: @"GET" toPath: @"/unittestdb/_design/objcview/_view/testobjc"
@@ -233,53 +273,5 @@ extern CouchbaseMobile* sCouchbase;  // Defined in EmptyAppDelegate.m
     STAssertFalse([eTag isEqualToString: [headers objectForKey: @"Etag"]], @"View didn't update");
 }
 
-
-@end
-
-
-@implementation TestView
-
-+ (NSString *)couchViewVersionIdentifierForSelector:(SEL)sel
-{
-    return @"v1.0";
-}
-
-#define NSAssertEqualObjects(A,B,MSG) NSAssert([(A) isEqual: (B)], @"Expected %@, got %@", (B), (A))
-#define NSAssertAlmostEqual(A,B) NSAssert(fabs((A)/(double)(B))-1.0 < 0.001, \
-                                          @"Expected %lf, got %lf", (B), (A))
-
-+ (NSArray*) testValuesMap:(NSDictionary *)doc
-{
-    NSString* txt = [doc objectForKey: @"txt"];
-    NSAssert(txt != nil, @"Missing txt key");
-    if ([txt isEqualToString: @"O HAI MR Obj-C!"]) {
-        // this is the doc with test values:
-        NSDictionary* numbers = [NSDictionary dictionaryWithObjectsAndKeys:
-                                 [NSNumber numberWithInt: 1234567], @"int",
-                                 [NSNumber numberWithDouble: 1234.5678], @"float",
-                                 [NSNumber numberWithInt: 0], @"zero", nil];
-        NSAssertEqualObjects(numbers, [doc objectForKey: @"numbers"], nil);
-        NSAssertAlmostEqual([[doc objectForKey: @"bignum"] doubleValue], 12345678901234567890.0);
-        NSArray* special = [NSArray arrayWithObjects: (id)kCFBooleanFalse,
-                                                      [NSNull null], kCFBooleanTrue, nil];
-        NSAssertEqualObjects(special, [doc objectForKey: @"special"], nil);
-        NSAssertEqualObjects([NSArray array], [doc objectForKey: @"empty array"], nil);
-        NSAssertEqualObjects([NSDictionary dictionary], [doc objectForKey: @"empty dict"], nil);
-    }
-    // Return an array of (key, value) pairs
-    return [NSArray arrayWithObject: [NSArray arrayWithObjects: txt, (id)kCFBooleanTrue, nil]];
-}
-
-+ (NSArray*) fauxMap:(NSDictionary*)doc
-{
-    // Return an array of (key, value) pairs
-    return [NSArray arrayWithObject: [NSArray arrayWithObjects: @"objc", (id)kCFBooleanFalse, nil]];
-}
-
-+ (id) reduceKeys:(NSArray*)keys values:(NSArray*)vals again:(BOOL)rereduce
-{
-    // keys is an array of (key, value) pairs
-    return [NSNumber numberWithUnsignedInteger:vals.count];
-}
 
 @end
