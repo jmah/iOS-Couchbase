@@ -172,7 +172,33 @@ extern CouchbaseMobile* sCouchbase;  // Defined in EmptyAppDelegate.m
 }
 
 
-- (void)test4_ObjCViews {
+- (void)test4_Collation {
+    // Test string collation order -- this is important because it's implemented in platform
+    // specific code, couch_icu_driver.m.
+    [self send: @"PUT" toPath: @"/unittestdb" body: nil];
+    [self send: @"PUT" toPath: @"/unittestdb/doc1" body: @"{\"str\":\"a\"}"];
+    [self send: @"PUT" toPath: @"/unittestdb/doc2" body: @"{\"str\":\"A\"}"];
+    [self send: @"PUT" toPath: @"/unittestdb/doc3" body: @"{\"str\":\"aa\"}"];
+    [self send: @"PUT" toPath: @"/unittestdb/doc4" body: @"{\"str\":\"b\"}"];
+    [self send: @"PUT" toPath: @"/unittestdb/doc5" body: @"{\"str\":\"B\"}"];
+
+    [self send: @"PUT" toPath: @"/unittestdb/_design/collation"
+          body: @"{\"views\":{\"simple\":{\"map\":\"function(doc){emit(doc.str,null);}\"}}}"];
+
+    NSString* result = [self send: @"GET" toPath: @"/unittestdb/_design/collation/_view/simple"
+                             body: nil responseHeaders: NULL];
+    STAssertEqualObjects(result, @"{\"total_rows\":5,\"offset\":0,\"rows\":[\r\n"
+                         "{\"id\":\"doc1\",\"key\":\"a\",\"value\":null},\r\n"
+                         "{\"id\":\"doc2\",\"key\":\"A\",\"value\":null},\r\n"
+                         "{\"id\":\"doc3\",\"key\":\"aa\",\"value\":null},\r\n"
+                         "{\"id\":\"doc4\",\"key\":\"b\",\"value\":null},\r\n"
+                         "{\"id\":\"doc5\",\"key\":\"B\",\"value\":null}\r\n"
+                         "]}\n",
+                         nil);
+}
+
+
+- (void)test5_ObjCViews {
     [self send: @"PUT" toPath: @"/unittestdb" body: nil];
     [self send: @"PUT" toPath: @"/unittestdb/doc1" body: @"{\"txt\":\"O HAI MR Obj-C!\"}"];
 

@@ -17,6 +17,8 @@
 		273112E1140559B30072C622 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 27A3ACF213C78BD9008CE9F0 /* InfoPlist.strings */; };
 		273112EB14055A410072C622 /* app.ini in Resources */ = {isa = PBXBuildFile; fileRef = 273112EA14055A410072C622 /* app.ini */; };
 		278D67FA1411494100198716 /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27A3AD0113C78BD9008CE9F0 /* SenTestingKit.framework */; };
+		2794EBF914227AD200A53EE2 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 2794EBF814227AD200A53EE2 /* libz.dylib */; };
+		2794EBFB14227B1100A53EE2 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 2794EBF814227AD200A53EE2 /* libz.dylib */; };
 		27962304142026430051455D /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27962303142026430051455D /* Security.framework */; };
 		2796230D142109170051455D /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27962303142026430051455D /* Security.framework */; };
 		27A3ACEA13C78BD9008CE9F0 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27A3ACE913C78BD9008CE9F0 /* UIKit.framework */; };
@@ -52,6 +54,7 @@
 		273112E6140559B30072C622 /* Listener.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Listener.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		273112EA14055A410072C622 /* app.ini */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; path = app.ini; sourceTree = "<group>"; };
 		2753C254140D54E300F334A7 /* installResources.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = installResources.sh; sourceTree = "<group>"; };
+		2794EBF814227AD200A53EE2 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
 		27962303142026430051455D /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		27A3ACE513C78BD9008CE9F0 /* Empty App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Empty App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		27A3ACE913C78BD9008CE9F0 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
@@ -85,6 +88,7 @@
 				278D67FA1411494100198716 /* SenTestingKit.framework in Frameworks */,
 				273112DC140559B30072C622 /* UIKit.framework in Frameworks */,
 				273112DB140559B30072C622 /* libstdc++.dylib in Frameworks */,
+				2794EBF914227AD200A53EE2 /* libz.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -93,12 +97,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				27962304142026430051455D /* Security.framework in Frameworks */,
-				27A3AD1D13C78DAC008CE9F0 /* libstdc++.dylib in Frameworks */,
 				27A3ACEA13C78BD9008CE9F0 /* UIKit.framework in Frameworks */,
 				27A3ACEC13C78BD9008CE9F0 /* Foundation.framework in Frameworks */,
 				27A3ACEE13C78BD9008CE9F0 /* CoreGraphics.framework in Frameworks */,
 				27EE5C8814103F59000AB2D7 /* SenTestingKit.framework in Frameworks */,
 				27A3AD1B13C78C32008CE9F0 /* Couchbase.framework in Frameworks */,
+				27A3AD1D13C78DAC008CE9F0 /* libstdc++.dylib in Frameworks */,
+				2794EBFB14227B1100A53EE2 /* libz.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -119,7 +124,6 @@
 		27A3ACDA13C78BD9008CE9F0 = {
 			isa = PBXGroup;
 			children = (
-				27962303142026430051455D /* Security.framework */,
 				27A3ACEF13C78BD9008CE9F0 /* Source */,
 				27A3AD0813C78BD9008CE9F0 /* Tests */,
 				27A3ACE813C78BD9008CE9F0 /* Frameworks */,
@@ -141,10 +145,12 @@
 			isa = PBXGroup;
 			children = (
 				27A3AD1C13C78DAC008CE9F0 /* libstdc++.dylib */,
+				2794EBF814227AD200A53EE2 /* libz.dylib */,
 				27A3AD1A13C78C32008CE9F0 /* Couchbase.framework */,
 				27A3ACE913C78BD9008CE9F0 /* UIKit.framework */,
 				27A3ACEB13C78BD9008CE9F0 /* Foundation.framework */,
 				27A3ACED13C78BD9008CE9F0 /* CoreGraphics.framework */,
+				27962303142026430051455D /* Security.framework */,
 				27A3AD0113C78BD9008CE9F0 /* SenTestingKit.framework */,
 			);
 			name = Frameworks;
