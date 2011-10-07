@@ -11,8 +11,8 @@
 set -e  # Bail out if any command returns an error
 
 echo "Building $1 into $3"
-mkdir -p $3
-cd $1
+mkdir -p "$3"
+cd "$1"
 
 if [ $# -ne 4 ]; then
     erlc -W0 +compressed -o "$3" $2
