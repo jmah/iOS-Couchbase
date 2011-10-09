@@ -8,6 +8,7 @@
 
 #import "EmptyAppTests.h"
 #import <Couchbase/CouchbaseMobile.h>
+#import <Couchbase/CouchbaseCallbacks.h>
 
 extern BOOL sUnitTesting;
 extern CouchbaseMobile* sCouchbase;  // Defined in EmptyAppDelegate.m
@@ -195,6 +196,111 @@ extern CouchbaseMobile* sCouchbase;  // Defined in EmptyAppDelegate.m
                          "{\"id\":\"doc5\",\"key\":\"B\",\"value\":null}\r\n"
                          "]}\n",
                          nil);
+}
+
+
+- (void)test5_ObjCViews {
+    [self send: @"PUT" toPath: @"/unittestdb" body: nil];
+    [self send: @"PUT" toPath: @"/unittestdb/doc1" body: @"{\"txt\":\"O HAI MR Obj-C!\","
+        "\"numbers\": {\"int\": 1234567, \"float\": 1234.5678, \"zero\": 0},"
+        "\"bignum\": 12345678901234567890,"
+        "\"special\": [false, null, true],"
+        "\"empty array\":[],"
+        "\"empty dict\": {}}"];
+    
+    [[CouchbaseCallbacks sharedInstance] registerMapBlock:
+     ^(NSDictionary *doc, CouchEmitBlock emit) {
+         NSString* txt = [doc objectForKey: @"txt"];
+         NSLog(@"In map block: txt=%@", txt);
+         NSAssert(txt != nil, @"Missing txt key");
+         if ([txt isEqualToString: @"O HAI MR Obj-C!"]) {
+             // this is the doc with test values:
+             NSDictionary* numbers = [NSDictionary dictionaryWithObjectsAndKeys:
+                                      [NSNumber numberWithInt: 1234567], @"int",
+                                      [NSNumber numberWithDouble: 1234.5678], @"float",
+                                      [NSNumber numberWithInt: 0], @"zero", nil];
+             STAssertEqualObjects(numbers, [doc objectForKey: @"numbers"], nil);
+             STAssertEqualsWithAccuracy([[doc objectForKey: @"bignum"] doubleValue],
+                                        12345678901234567890.0, 1.0, nil);
+             NSArray* special = [NSArray arrayWithObjects: (id)kCFBooleanFalse,
+                                 [NSNull null], kCFBooleanTrue, nil];
+             STAssertEqualObjects(special, [doc objectForKey: @"special"], nil);
+             STAssertEqualObjects([NSArray array], [doc objectForKey: @"empty array"], nil);
+             STAssertEqualObjects([NSDictionary dictionary], [doc objectForKey: @"empty dict"], nil);
+         }
+         emit(txt, nil);
+     } forKey: @"testValuesMap"];
+    
+    [[CouchbaseCallbacks sharedInstance] registerMapBlock:
+     ^(NSDictionary *doc, CouchEmitBlock emit) {
+         NSLog(@"In faux map block");
+         emit(@"objc", nil);
+     } forKey: @"fauxMap"];
+
+    
+    [[CouchbaseCallbacks sharedInstance] registerReduceBlock:
+     ^ id (NSArray *keys, NSArray *values, BOOL rereduce) {
+         NSLog(@"In reduce block");
+         return [NSNumber numberWithUnsignedInteger:values.count];
+     } forKey:@"count"];
+
+    [self send: @"PUT" toPath: @"/unittestdb/_design/objcview"
+          body: @"{\"language\":\"objc\", \"views\":"
+                @"{\"testobjc\":{\"map\":\"testValuesMap\","
+                @"\"reduce\":\"count\"},"
+                @"\"testmap2\":{\"map\":\"fauxMap\","
+                @"\"reduce\":\"count\"}}}"];
+
+    NSDictionary* headers;
+    [self send: @"GET" toPath: @"/unittestdb/_design/objcview/_view/testobjc"
+          body: nil responseHeaders: &headers];
+    NSString* eTag = [headers objectForKey: @"Etag"];
+    NSLog(@"ETag: %@", eTag);
+    STAssertNotNil(eTag, nil);
+    [self send: @"GET" toPath: @"/unittestdb/_design/objcview/_view/testobjc"
+          body: nil responseHeaders: &headers];
+    NSLog(@"ETag: %@", [headers objectForKey: @"Etag"]);
+    STAssertEqualObjects([headers objectForKey: @"Etag"], eTag, @"View eTag isn't stable");
+
+    [self send: @"PUT" toPath: @"/unittestdb/doc2" body: @"{\"txt\":\"KTHXBYE\"}"];
+
+    [self send: @"GET" toPath: @"/unittestdb/_design/objcview/_view/testobjc"
+          body: nil responseHeaders: &headers];
+    NSLog(@"ETag: %@", [headers objectForKey: @"Etag"]);
+    STAssertFalse([eTag isEqualToString: [headers objectForKey: @"Etag"]], @"View didn't update");
+}
+
+
+- (void) test6_ObjCValidation {
+    [[CouchbaseCallbacks sharedInstance] registerValidateUpdateBlock:
+     ^BOOL(NSDictionary *doc, id<CouchbaseValidationContext> context) {
+         STAssertEqualObjects(context.databaseName, @"unittestdb", nil);
+         STAssertNil(context.userName, nil);
+         STAssertTrue(context.isAdmin, nil);
+         STAssertNotNil(context.security, nil);
+         BOOL ok = [doc objectForKey: @"valid"] != nil;
+         NSLog(@"In validation block; returning %i", ok);
+         if (!ok)
+             context.errorMessage = @"totally bogus";
+         return ok;
+     } forKey: @"VALIDATE"];
+
+    [self send: @"PUT" toPath: @"/unittestdb" body: nil];
+    [self send: @"PUT" toPath: @"/unittestdb/_design/objcvalidation"
+          body: @"{\"language\":\"objc\","
+                @"\"validate_doc_update\":\"VALIDATE\"}"];
+    
+    [self send: @"PUT" toPath: @"/unittestdb/doc1" body: @"{\"valid\":true}"];
+    
+    NSURLRequest* request = [self request:@"PUT" path:@"/unittestdb/doc2"
+                                     body:@"{\"something\":\"O HAI\"}"];
+    NSHTTPURLResponse* response = nil;
+    NSData* output = [NSURLConnection sendSynchronousRequest: request
+                          returningResponse: (NSURLResponse**)&response
+                                      error: NULL];
+    STAssertEquals(response.statusCode, 403, @"Unexpected HTTP status (should be forbidden)");
+    NSString* outputStr = [[[NSString alloc] initWithData: output encoding: NSUTF8StringEncoding] autorelease];
+    STAssertEqualObjects(outputStr, @"{\"error\":\"forbidden\",\"reason\":\"totally bogus\"}\n", nil);
 }
 
 
