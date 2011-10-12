@@ -209,7 +209,7 @@ extern CouchbaseMobile* sCouchbase;  // Defined in EmptyAppDelegate.m
         "\"empty dict\": {}}"];
     
     [[CouchbaseCallbacks sharedInstance] registerMapBlock:
-     ^(NSDictionary *doc, CouchEmitBlock emit) {
+     CouchVersionedBlock((^(NSDictionary *doc, CouchEmitBlock emit) {
          NSString* txt = [doc objectForKey: @"txt"];
          NSLog(@"In map block: txt=%@", txt);
          NSAssert(txt != nil, @"Missing txt key");
@@ -229,20 +229,20 @@ extern CouchbaseMobile* sCouchbase;  // Defined in EmptyAppDelegate.m
              STAssertEqualObjects([NSDictionary dictionary], [doc objectForKey: @"empty dict"], nil);
          }
          emit(txt, nil);
-     } forKey: @"testValuesMap"];
+     })) forKey: @"testValuesMap"];
     
     [[CouchbaseCallbacks sharedInstance] registerMapBlock:
-     ^(NSDictionary *doc, CouchEmitBlock emit) {
+     CouchVersionedBlock((^(NSDictionary *doc, CouchEmitBlock emit) {
          NSLog(@"In faux map block");
          emit(@"objc", nil);
-     } forKey: @"fauxMap"];
+     })) forKey: @"fauxMap"];
 
     
     [[CouchbaseCallbacks sharedInstance] registerReduceBlock:
-     ^ id (NSArray *keys, NSArray *values, BOOL rereduce) {
+     CouchVersionedBlock((^ id (NSArray *keys, NSArray *values, BOOL rereduce) {
          NSLog(@"In reduce block");
          return [NSNumber numberWithUnsignedInteger:values.count];
-     } forKey:@"count"];
+     })) forKey:@"count"];
 
     [self send: @"PUT" toPath: @"/unittestdb/_design/objcview"
           body: @"{\"language\":\"objc\", \"views\":"
