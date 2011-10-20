@@ -172,28 +172,23 @@ static const NSTimeInterval kWaitTimeout = 30.0;    // How long to wait for Couc
 
 // Body of the pthread that runs Erlang (and CouchDB)
 - (void)erlangThread {
-	char* erlang_args[18] = {"beam", "--", "-noinput",
+	char* erlang_args[15] = {"beam", "--", "-noinput",
         "-sasl", "errlog_type", "error",  // Change "error" to "all" to re-enable progress reports
 		"-eval", "R = application:start(couch), io:format(\"~w~n\",[R]).",
-        "-pa", NULL, ":",
 		"-root", NULL, "-couch_ini", NULL, NULL, NULL, NULL};
     int erlang_argc;
     {
-        // Alloc some paths to pass in as args to erl_start.
-        // erl_root points to the root of the ZIP archive where the .beam files live.
-        // erl_extras points to the erlang dir where unzippable files (.js mostly) live.
+        // Alloc some paths to pass in as args to erl_start:
         NSAutoreleasePool* pool = [NSAutoreleasePool new];
-        char* erl_root = strdup([[_bundlePath stringByAppendingPathComponent:@"couchbasemobile.ez"]
-                                 fileSystemRepresentation]);
-        char* erl_extras = strdup([_bundlePath fileSystemRepresentation]);
-        erlang_args[9] = erl_extras;
-        erlang_args[12] = erl_root;
-        // Yes, there are up to four layers of .ini files: Default, iOS, app, local.
-        erlang_args[14] = strdup([[_bundlePath stringByAppendingPathComponent:@"default.ini"]
+        char* erl_root = strdup([[_bundlePath stringByAppendingPathComponent:@"erlang"]
                                             fileSystemRepresentation]);
-        erlang_args[15] = strdup([[_documentsDirectory stringByAppendingPathComponent:
+        erlang_args[9] = erl_root;
+        // Yes, there are up to four layers of .ini files: Default, iOS, app, local.
+        erlang_args[11] = strdup([[_bundlePath stringByAppendingPathComponent:@"default.ini"]
+                                            fileSystemRepresentation]);
+        erlang_args[12] = strdup([[_documentsDirectory stringByAppendingPathComponent:
                                             @"default_ios.ini"] fileSystemRepresentation]);
-        erlang_argc = 16;
+        erlang_argc = 13;
         if (_iniFilePath)
             erlang_args[erlang_argc++] = strdup([_iniFilePath fileSystemRepresentation]);
         erlang_args[erlang_argc++] = strdup([self.localIniFilePath fileSystemRepresentation]);
@@ -201,22 +196,15 @@ static const NSTimeInterval kWaitTimeout = 30.0;    // How long to wait for Couc
         // Set some environment variables for Erlang:
         char erl_bin[1024];
         char erl_inetrc[1024];
-        sprintf(erl_bin, "%s/lib/erts-5.7.5/bin", erl_root);
+        sprintf(erl_bin, "%s/erts-5.7.5/bin", erl_root);
         sprintf(erl_inetrc, "%s/erl_inetrc", erl_root);
 
-        setenv("ROOTDIR", erl_extras, 1);
+        setenv("ROOTDIR", erl_root, 1);
         setenv("BINDIR", erl_bin, 1);
         setenv("ERL_INETRC", erl_inetrc, 1);
         
         [pool drain];
     }
-        
-#if 0
-        fprintf(stderr, "Launching Erlang with argv: ");
-        for (int i=0; i<erlang_argc; ++i)
-            fprintf(stderr, "%s ", erlang_args[i]);
-        fprintf(stderr, "\n");
-#endif
 
 	erl_start(erlang_argc, erlang_args);     // This never returns (unless Erlang exits)
 }

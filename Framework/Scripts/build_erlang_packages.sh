@@ -7,7 +7,7 @@
 set -e  # Bail out if any command returns an error
 export PATH=$PATH:/usr/local/bin:/opt/local/bin  # Erlang is often installed in nonstandard places
 
-ERLANG_DSTDIR="${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/CouchbaseResources"
+ERLANG_DSTDIR="${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/CouchbaseResources/erlang"
 COMPILE=Scripts/compile_erlang_dir.sh
 
 # First copy the checked-in erlang resources into the framework:
@@ -37,10 +37,3 @@ $COMPILE "../../vendor/geocouch/src/vtree" "vtree.erl vtree_bulk.erl vtree_insbe
 echo "Stripping .beam files..."
 cd "${ERLANG_DSTDIR}"
 erl -noinput -eval 'erlang:display(beam_lib:strip_release("."))' -s init stop
-
-# Archive all the Erlang files into a Zip file. (Don't compress the already-gz'd .beam files.)
-rm -f couchbasemobile.ez
-zip --test -r couchbasemobile.ez bin lib erl_inetrc \
-    --include '*.beam' '*.app' '*.appup' '*.boot' 'erl_inetrc' \
-    -n .beam
-rm -rf bin lib erl_inetrc
